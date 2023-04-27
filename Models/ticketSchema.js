@@ -2,12 +2,13 @@ import mongoose from 'mongoose';
 
 const TicketSchema =new  mongoose.Schema({
     message: String,
-    address: String,
-    contact: Number,
-    name: String,
+    contactno: Number,
+    busname: String,
     busno: Number,
-    seats: Number,
+    seatno: Number,
+    totalseats: Number,
     amount: Number,
+    is_booked: Boolean,
     selectedFile: String,
     from: String,
     to: String,
@@ -18,5 +19,4 @@ const TicketSchema =new  mongoose.Schema({
 });
 
 const Details = mongoose.model('Details', TicketSchema);
-
 export default Details;

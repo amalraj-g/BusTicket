@@ -10,21 +10,18 @@ export const userSignIn = async (req, res) => {
         const existingUser = await User.findOne({ email});
         if(existingUser.role === 'admin'){
             if(!existingUser) return res.status(notFound).json({ message: 'user doesnot exist'}) ;
-            
             const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
             if(!isPasswordCorrect)return res.status(badRequest).json({ message: 'Invalid credential'});
-            
                 
             const token = jwt.sign({email:existingUser.email, id: existingUser._id} ,process.env.SECRET, {expiresIn:'1hr'});
             res.status(ok).json({ token});
-    
         } else {
-                if(!existingUser) return res.status(notFound).json({ message: 'user doesnot exist'}) ;
             
+            if(!existingUser) return res.status(notFound).json({ message: 'user doesnot exist'}) ;
             const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
             if(!isPasswordCorrect)return res.status(badRequest).json({ message: 'Invalid credential'});
-            
-            }
+            res.status(ok).json({ message:'login by user'});
+        }
     } catch(error){
         res.status(serverError).json({message:'somethng went wrong'});
 
