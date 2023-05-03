@@ -5,7 +5,7 @@ import Details from '../Models/ticketSchema.js';
 import { ok, notFound, conflict, created } from '../default/constantvalue.js';
 const router = express.Router();
 
-export const busdetails= async(req, res)=>{
+export const busDetails= async(req, res)=>{
    try {
         const tickets=  await Details.find();
         res.status(ok).json(tickets);
@@ -27,8 +27,7 @@ export const printbookedTicket = async (req, res ) => {
     try {
         const postReversation= await Details.find({is_booked:true});
         res.status(ok).json(postReversation);
-        
-    } catch (error) {
+        } catch (error) {
         res.status( notFound).json({ message: error.message });
     }
 };
