@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js"
+    "test": "cross-env NODE_ENV=test jest ",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,16 @@
     "mongoose": "7.1.0",
     "nodemon": "2.0.22",
     "swagger-jsdoc": "6.2.8",
-    "swagger-ui-express": "4.6.2"
+    "swagger-ui-express": "4.6.2",
+    "upgrade": "1.1.0"
+  },
+  "devDependencies": {
+    "add": "2.0.6",
+    "jest": "29.5.0",
+    "supertest": "6.3.3",
+    "yarn": "1.22.19"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
