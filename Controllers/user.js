@@ -2,14 +2,14 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import User from '../Models/user.js';
-import { ok, notFound, badRequest, serverError } from '../default/constantvalue.js'; 
+import { ok, unAuthorized, notFound, badRequest, serverError } from '../default/constantvalue.js'; 
 
 export const userSignIn = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     try{
         const existingUser = await User.findOne({ email});
         if(existingUser.role === 'admin'){
-            if(!existingUser) return res.status(notFound).json({ message: 'user doesnot exist'}) ;
+            if(!existingUser.role) return res.status(notFound).json({ message: 'user does not exist'}) ;
             const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
             if(!isPasswordCorrect)return res.status(badRequest).json({ message: 'Invalid credential'});
                 
@@ -17,13 +17,13 @@ export const userSignIn = async (req, res) => {
             res.status(ok).json({ token});
         } else {
             
-            if(!existingUser) return res.status(notFound).json({ message: 'user doesnot exist'}) ;
+            if(!existingUser.role) return res.status(notFound).json({ message: 'user does not exist'}) ;
             const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
             if(!isPasswordCorrect)return res.status(badRequest).json({ message: 'Invalid credential'});
             res.status(ok).json({ message:'login by user'});
         }
     } catch(error){
-        res.status(serverError).json({message:'somethng went wrong'});
+        res.status(serverError).json({message:'something went wrong'});
 
     }
     
@@ -32,17 +32,17 @@ export const userSignIn = async (req, res) => {
 export const userSignUp = async  (req, res) => {
     const{email, password, confirmPassword, role} = req.body;
     try{
+        
         const existingUser = await User.findOne({ email});
-        if(existingUser) return res.status(badRequest).json({ message: 'user doesnot exist'}) ;
-
-        if(password !== confirmPassword) return res.status(badRequest).json({ message: 'passwords do not match'}) ;
+        if(existingUser) return res.status(badRequest).json({ message: 'user does not exist'}) ;
+        
+        if(password !== confirmPassword) return res.status(unAuthorized).json({ message: 'passwords do not match'}) ;
         const hashedPassword = await bcrypt.hash(password,12);
         const result =await User.create({email, password: hashedPassword});
-
         res.status(ok).json({ result});
         
     }catch(error) {
-        res.status(serverError).json({message:'somethng went wrong'});
+        res.status(serverError).json({message:'something went wrong'});
 
     }
 
