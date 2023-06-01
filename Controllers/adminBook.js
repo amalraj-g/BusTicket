@@ -34,8 +34,9 @@ export const printbookedTicket = async (req, res ) => {
 
 export const createReservation = async (req, res) => {
     const book = req.body;
-    const newBookDetails = new Details({ ...book ,createdAt: new Date().toISOString() });
+    
     try {
+        const newBookDetails =new  Details({ ...book ,createdAt: new Date().toISOString() });
         await newBookDetails.save();
         res.status(created).json(newBookDetails );
     } catch (error) {
