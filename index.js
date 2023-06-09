@@ -50,5 +50,5 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 
 mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => app.listen(PORT, () => console.log(`Server Running on Port successfully: http://localhost:${PORT}`)));            
-
+.then(() => app.listen(PORT, () => console.log(`Server Running on Port successfully: http://localhost:${PORT}`)));
+     

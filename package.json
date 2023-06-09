@@ -43,6 +43,5 @@
   },
   "jest": {
     "testEnvironment": "node"
-    
   }
 }

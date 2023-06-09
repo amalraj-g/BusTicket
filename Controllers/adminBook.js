@@ -34,11 +34,10 @@ export const printbookedTicket = async (req, res ) => {
 
 export const createReservation = async (req, res) => {
     const book = req.body;
-    
     try {
-        const newBookDetails =new  Details({ ...book ,createdAt: new Date().toISOString() });
-        await newBookDetails.save();
-        res.status(created).json(newBookDetails );
+        const newBookDetails =new Details({ ...book ,createdAt: new Date().toISOString() });
+        const newBook = await newBookDetails.save();
+        res.status(created).json(newBook );
     } catch (error) {
         res.status(conflict).json({ message: error.message });
     }
@@ -48,9 +47,9 @@ export const updateReservation = async (req, res) => {
     const { id } = req.params;
     const {  busname, from, to, message, is_booked, contactno, amount, address, busno, seatno, totalseats } = req.body;
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status( notFound).send(`No book with id: ${id}`);
-    const updateReservation = { busname, from, to, contactno, is_booked, amount, address, busno, totalseats, seatno, message , _id: id };
-    await Details.findByIdAndUpdate(id, updateReservation, { new: true });
-    res.json(updateReservation);
+    const updateReservation = {busname, from, to, message, is_booked, contactno, amount, address, busno, seatno, totalseats, _id: id };
+    const updated= await Details.findByIdAndUpdate(id, updateReservation, { new: true });
+    res.json(updated);
 };
 
 export const deleteReservation = async (req, res) => {

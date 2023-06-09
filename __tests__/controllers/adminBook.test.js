@@ -1,9 +1,10 @@
-import mongoose from 'mongoose';
-import request from 'supertest';
+
 import Details from '../../Models/ticketSchema.js';
 import { ok, notFound, conflict, created } from '../../default/constantvalue.js';
-import { availableTickets, printbookedTicket, createReservation, updateReservation,  deleteReservation, busDetails } from '../../Controllers/adminBook.js';import express from 'express';
-import auth from '../../middleware/auth.js';
+import { availableTickets, printbookedTicket, createReservation, updateReservation,  deleteReservation, busDetails } from '../../Controllers/adminBook.js';
+import request from 'supertest';
+import mongoose from 'mongoose';
+
 
 jest.mock('mongoose');
 jest.mock('jsonwebtoken');
@@ -61,9 +62,6 @@ describe('busDetails', () => {
 });
 
 
-
-
-
 jest.mock('../../Models/ticketSchema.js'); // Replace 'your-details-model' with the actual path to your model
 
 describe('printbookedTicket', () => {
@@ -91,7 +89,7 @@ describe('printbookedTicket', () => {
     expect(res.status).toHaveBeenCalledWith(ok);
     expect(res.json).toHaveBeenCalledWith(bookedTickets);
   });
-
+ 
   test('should respond with an error if an exception is thrown', async () => {
     const errorMessage = 'Some error message';
     Details.find.mockRejectedValue(new Error(errorMessage));
@@ -103,5 +101,156 @@ describe('printbookedTicket', () => {
     expect(res.json).toHaveBeenCalledWith({ message: errorMessage });
   });
 });
+
+
+
+jest.mock('../../Models/ticketSchema.js', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+describe('createReservation', () => {
+  it('should create a new reservation', async () => {
+    const saveMock = jest.fn().mockResolvedValueOnce({ _id: '1',  busname: String,
+    busno: Number,
+    seatno: Number,
+    totalseats: Number, });
+    Details.mockImplementationOnce(() => ({
+      save: saveMock,
+    }));
+
+    const req = {
+      body: {
+        busname: String,
+            busno: Number,
+            seatno: Number,
+            totalseats: Number,
+      },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    await createReservation(req, res);
+
+    //expect(Details).toHaveBeenCalledTimes(1);
+    expect(Details).toHaveBeenCalledWith({
+      busname: String,
+            busno: Number,
+            seatno: Number,
+            totalseats: Number,
+      createdAt: expect.any(String),
+    });
+
+    expect(saveMock).toHaveBeenCalledTimes(1);
+
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith({ _id: '1', busname: String,
+    busno: Number,
+    seatno: Number,
+    totalseats: Number, });
+  });
+
+  it('should handle errors', async () => {
+    const errorMessage = 'An error occurred.';
+    Details.mockImplementationOnce(() => ({
+      save: jest.fn().mockRejectedValueOnce(new Error(errorMessage)),
+    }));
+
+    const req = {
+      body: {
+        busname: String,
+            busno: Number,
+            seatno: Number,
+            totalseats: Number,
+      },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    await createReservation(req, res);
+
+    //expect(Details).toHaveBeenCalledTimes(1);
+
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith({ message: errorMessage });
+  });
+});
+
+
+
+jest.mock('../../Models/ticketSchema.js', () => ({
+  __esModule: true,
+  default: jest.fn(),
+  findByIdAndUpdate: jest.fn(),
+}));
+
+describe('updateReservation', () => {
+  it('should update a reservation', async () => {
+    const validId = mongoose.Types.ObjectId();
+    const updatedReservation = {
+      _id: validId,
+      busname: 'New Bus Name',
+      from: 'New From Location',
+      to: 'New To Location',
+      message: 'New Message',
+      is_booked: true,
+      contactno: '1234567890',
+      amount: 100,
+      address: 'New Address',
+      busno: 'New Bus No',
+      seatno: 'New Seat No',
+      totalseats: 10,
+    };
+
+    const findByIdAndUpdateMock = jest.fn().mockResolvedValueOnce(updatedReservation);
+    Details.findByIdAndUpdate.mockImplementationOnce(findByIdAndUpdateMock);
+
+    const req = {
+      params: {
+        id: validId,
+      },
+      body: updatedReservation,
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+      json: jest.fn(),
+    };
+
+    await updateReservation(req, res);
+
+    expect(Details.findByIdAndUpdate).toHaveBeenCalledTimes(1);
+    expect(Details.findByIdAndUpdate).toHaveBeenCalledWith(validId, updatedReservation, { new: true });
+
+    expect(res.json).toHaveBeenCalledTimes(1);
+    expect(res.json).toHaveBeenCalledWith(updatedReservation);
+  });
+
+  it('should return notFound status if id is invalid', async () => {
+    const invalidId = 'invalid-id';
+    const req = {
+      params: {
+        id: invalidId,
+      },
+      body: {},
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+
+    await updateReservation(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith(`No book with id: ${invalidId}`);
+  });
+});
+
+
+
 
 
