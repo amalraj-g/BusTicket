@@ -45,9 +45,9 @@ export const createReservation = async (req, res) => {
 
 export const updateReservation = async (req, res) => {
     const { id } = req.params;
-    const {  busname, from, to, message, is_booked, contactno, amount, address, busno, seatno, totalseats } = req.body;
+    const { busname, from, to, message, is_booked, contactno, busno, seatno, totalseats } = req.body;
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status( notFound).send(`No book with id: ${id}`);
-    const updateReservation = {busname, from, to, message, is_booked, contactno, amount, address, busno, seatno, totalseats, _id: id };
+    const updateReservation = {busname, from, to, message, is_booked, contactno, busno, seatno, totalseats, _id: id };
     const updated= await Details.findByIdAndUpdate(id, updateReservation, { new: true });
     res.json(updated);
 };

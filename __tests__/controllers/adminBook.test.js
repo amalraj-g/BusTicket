@@ -181,16 +181,25 @@ describe('createReservation', () => {
 });
 
 
-
+jest.mock('mongoose', () => ({
+  Types: {
+    ObjectId: {
+      isValid: jest.fn(),}
+  },
+}));
 jest.mock('../../Models/ticketSchema.js', () => ({
   __esModule: true,
   default: jest.fn(),
-  findByIdAndUpdate: jest.fn(),
-}));
+ }));
+ beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('updateReservation', () => {
   it('should update a reservation', async () => {
-    const validId = mongoose.Types.ObjectId();
+    console.log('########', mongoose.Types.ObjectId)
+    const validId = '644a74544c490973217ea6fa';
+    
     const updatedReservation = {
       _id: validId,
       busname: 'New Bus Name',
@@ -199,15 +208,13 @@ describe('updateReservation', () => {
       message: 'New Message',
       is_booked: true,
       contactno: '1234567890',
-      amount: 100,
-      address: 'New Address',
       busno: 'New Bus No',
       seatno: 'New Seat No',
       totalseats: 10,
     };
-
-    const findByIdAndUpdateMock = jest.fn().mockResolvedValueOnce(updatedReservation);
-    Details.findByIdAndUpdate.mockImplementationOnce(findByIdAndUpdateMock);
+    console.log('########', mongoose.Types.ObjectId.isValid)
+    mongoose.Types.ObjectId.isValid.mockResolvedValue(true)
+    Details.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedReservation)
 
     const req = {
       params: {
@@ -216,13 +223,12 @@ describe('updateReservation', () => {
       body: updatedReservation,
     };
     const res = {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
       json: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn()
     };
 
     await updateReservation(req, res);
-
     expect(Details.findByIdAndUpdate).toHaveBeenCalledTimes(1);
     expect(Details.findByIdAndUpdate).toHaveBeenCalledWith(validId, updatedReservation, { new: true });
 
@@ -230,8 +236,9 @@ describe('updateReservation', () => {
     expect(res.json).toHaveBeenCalledWith(updatedReservation);
   });
 
-  it('should return notFound status if id is invalid', async () => {
+it('should return notFound status if id is invalid', async () => {
     const invalidId = 'invalid-id';
+    
     const req = {
       params: {
         id: invalidId,
@@ -239,16 +246,20 @@ describe('updateReservation', () => {
       body: {},
     };
     const res = {
+      json: jest.fn(),
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     };
-
+    mongoose.Types.ObjectId.isValid.mockResolvedValue(false);
     await updateReservation(req, res);
-
+    
+    expect(res.status).toHaveBeenCalledTimes(1);
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.send).toHaveBeenCalledWith(`No book with id: ${invalidId}`);
   });
 });
+
+
 
 
 
