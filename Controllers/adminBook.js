@@ -54,7 +54,7 @@ export const updateReservation = async (req, res) => {
 
 export const deleteReservation = async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status( notFound).send(`No book  with id: ${id}`);
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status( notFound).send(`No book with id: ${id}`);
     await Details.findByIdAndRemove(id);
     res.json({ message: 'Reservation deleted successfully.' });
 };

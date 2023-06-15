@@ -213,7 +213,7 @@ describe('updateReservation', () => {
       totalseats: 10,
     };
     console.log('########', mongoose.Types.ObjectId.isValid)
-    mongoose.Types.ObjectId.isValid.mockResolvedValue(true)
+    mongoose.Types.ObjectId.isValid.mockReturnValueOnce(true)
     Details.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(updatedReservation)
 
     const req = {
@@ -250,7 +250,7 @@ it('should return notFound status if id is invalid', async () => {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     };
-    mongoose.Types.ObjectId.isValid.mockResolvedValue(false);
+    mongoose.Types.ObjectId.isValid.mockReturnValueOnce(false);
     await updateReservation(req, res);
     
     expect(res.status).toHaveBeenCalledTimes(1);
@@ -259,6 +259,77 @@ it('should return notFound status if id is invalid', async () => {
   });
 });
 
+
+jest.mock('mongoose', () => ({
+  Types: {
+    ObjectId: {
+      isValid: jest.fn(),}
+  },
+}));
+jest.mock('../../Models/ticketSchema.js', () => ({
+  __esModule: true,
+  default: jest.fn(),
+ }));
+ beforeEach(() => {
+  jest.clearAllMocks();
+});
+describe('deleteReservation', () => {
+  it('should delete a reservation', async () => {
+    const validId = '644a74544c490973217ea6fa';
+    mongoose.Types.ObjectId.isValid.mockReturnValueOnce(true)
+    Details.findByIdAndRemove = jest.fn().mockResolvedValueOnce(validId)
+    const req = {
+      params: {
+        id: validId, // Provide a valid ID for testing
+      },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+      json: jest.fn(),
+    };
+
+    
+    await deleteReservation(req, res);
+
+    //expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(validId);
+    expect(Details.findByIdAndRemove).toHaveBeenCalledTimes(1);
+    expect(Details.findByIdAndRemove).toHaveBeenCalledWith(validId);
+    expect(res.json).toHaveBeenCalledWith({ message: 'Reservation deleted successfully.' });
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.send).not.toHaveBeenCalled();
+  });
+
+  it('should return "Not Found" if the ID is invalid', async () => {
+    const invalidId = 'invalid-id';
+    const req = {
+      params: {
+        id: invalidId, // Provide an invalid ID for testing
+      },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+      json: jest.fn(),
+    };
+
+    // Assuming you have a mocked mongoose object
+    const mongoose = {
+      Types: {
+        ObjectId: {
+          isValid: jest.fn().mockReturnValueOnce(false),
+        },
+      },
+    };
+
+    await deleteReservation(req, res);
+
+    //expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(invalidId);
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith('No book with id: invalid-id');
+    expect(res.json).not.toHaveBeenCalled();
+  });
+});
 
 
 
