@@ -14,15 +14,6 @@ export const busDetails= async(req, res)=>{
    } 
 };
 
-export const availableTickets = async (req, res ) => {
-    try {
-        const fromtickets=  await Details.find({is_booked:{ $ne:true}});
-        res.status(ok).json(fromtickets);
-    } catch (error) {
-        res.status( notFound).json({ message: error.message });
-    }
-};
-
 export const printbookedTicket = async (req, res ) => {
     try {
         const postReversation= await Details.find({is_booked:true});

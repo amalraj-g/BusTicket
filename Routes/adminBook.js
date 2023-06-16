@@ -1,4 +1,4 @@
-import { availableTickets, printbookedTicket, createReservation, updateReservation,  deleteReservation, busDetails } from '../Controllers/adminBook.js';
+import {busDetails, printbookedTicket, createReservation, updateReservation,  deleteReservation  } from '../Controllers/adminBook.js';
 import express from 'express';
 
 import auth from '../middleware/auth.js';
@@ -6,7 +6,6 @@ const router = express.Router();
 
 
 router.get('/', busDetails);
-router.get('/admin/mybus', availableTickets);
 router.get('/admin', printbookedTicket);
 router.post('/mybus', createReservation);
 router.delete('/mybus/:id',deleteReservation);

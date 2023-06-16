@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 import {  unAuthorized, serverError } from '../default/constantvalue.js';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const auth = async ( req, res, next) => {

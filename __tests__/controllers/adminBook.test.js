@@ -1,8 +1,7 @@
 
 import Details from '../../Models/ticketSchema.js';
 import { ok, notFound, conflict, created } from '../../default/constantvalue.js';
-import { availableTickets, printbookedTicket, createReservation, updateReservation,  deleteReservation, busDetails } from '../../Controllers/adminBook.js';
-import request from 'supertest';
+import {  printbookedTicket, createReservation, updateReservation,  deleteReservation, busDetails } from '../../Controllers/adminBook.js';
 import mongoose from 'mongoose';
 
 
@@ -62,21 +61,21 @@ describe('busDetails', () => {
 });
 
 
-jest.mock('../../Models/ticketSchema.js'); // Replace 'your-details-model' with the actual path to your model
+jest.mock('../../Models/ticketSchema.js'); 
 
 describe('printbookedTicket', () => {
   let req, res;
 
   beforeEach(() => {
-    req = {}; // Mock the request object as per your requirements
+    req = {};
     res = {
       status: jest.fn(() => res),
       json: jest.fn()
-    }; // Mock the response object with necessary methods
+    }; 
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // Clear mocks after each test
+    jest.clearAllMocks(); 
   });
 
   test('should respond with booked tickets if found', async () => {
@@ -134,7 +133,6 @@ describe('createReservation', () => {
 
     await createReservation(req, res);
 
-    //expect(Details).toHaveBeenCalledTimes(1);
     expect(Details).toHaveBeenCalledWith({
       busname: String,
             busno: Number,
@@ -145,7 +143,7 @@ describe('createReservation', () => {
 
     expect(saveMock).toHaveBeenCalledTimes(1);
 
-    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.status).toHaveBeenCalledWith(created);
     expect(res.json).toHaveBeenCalledWith({ _id: '1', busname: String,
     busno: Number,
     seatno: Number,
@@ -173,9 +171,7 @@ describe('createReservation', () => {
 
     await createReservation(req, res);
 
-    //expect(Details).toHaveBeenCalledTimes(1);
-
-    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.status).toHaveBeenCalledWith(conflict);
     expect(res.json).toHaveBeenCalledWith({ message: errorMessage });
   });
 });
@@ -254,7 +250,7 @@ it('should return notFound status if id is invalid', async () => {
     await updateReservation(req, res);
     
     expect(res.status).toHaveBeenCalledTimes(1);
-    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.status).toHaveBeenCalledWith(notFound);
     expect(res.send).toHaveBeenCalledWith(`No book with id: ${invalidId}`);
   });
 });
@@ -280,7 +276,7 @@ describe('deleteReservation', () => {
     Details.findByIdAndRemove = jest.fn().mockResolvedValueOnce(validId)
     const req = {
       params: {
-        id: validId, // Provide a valid ID for testing
+        id: validId, 
       },
     };
     const res = {
@@ -291,8 +287,6 @@ describe('deleteReservation', () => {
 
     
     await deleteReservation(req, res);
-
-    //expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(validId);
     expect(Details.findByIdAndRemove).toHaveBeenCalledTimes(1);
     expect(Details.findByIdAndRemove).toHaveBeenCalledWith(validId);
     expect(res.json).toHaveBeenCalledWith({ message: 'Reservation deleted successfully.' });
@@ -304,7 +298,7 @@ describe('deleteReservation', () => {
     const invalidId = 'invalid-id';
     const req = {
       params: {
-        id: invalidId, // Provide an invalid ID for testing
+        id: invalidId, 
       },
     };
     const res = {
@@ -313,8 +307,7 @@ describe('deleteReservation', () => {
       json: jest.fn(),
     };
 
-    // Assuming you have a mocked mongoose object
-    const mongoose = {
+   const mongoose = {
       Types: {
         ObjectId: {
           isValid: jest.fn().mockReturnValueOnce(false),
@@ -323,15 +316,11 @@ describe('deleteReservation', () => {
     };
 
     await deleteReservation(req, res);
-
-    //expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(invalidId);
-    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.status).toHaveBeenCalledWith(notFound);
     expect(res.send).toHaveBeenCalledWith('No book with id: invalid-id');
     expect(res.json).not.toHaveBeenCalled();
   });
 });
-
-
 
 
 
