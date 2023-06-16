@@ -9,7 +9,7 @@ export const userSignIn = async (req, res) => {
     try{
         const existingUser = await User.findOne({ email});
         if(existingUser.role === 'admin'){
-            if(!existingUser.role) return res.status(notFound).json({ message: 'user does not exist'}) ;
+            if(!existingUser.role) return res.status(notFound).json({ message: 'admin does not exist'}) ;
             const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
             if(!isPasswordCorrect)return res.status(badRequest).json({ message: 'Invalid credential'});
                 
