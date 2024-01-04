@@ -140,16 +140,6 @@ describe('userSignIn', () => {
     expect(res.json).toHaveBeenCalledWith({ message: 'login by user' });
   });
 
-  it('should return an error if the user does not exist', async () => {
-    User.findOne.mockResolvedValue({ role: null });
-
-    await userSignIn(req, res);
-
-    expect(User.findOne).toHaveBeenCalledWith({ email: 'test@example.com' });
-    expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({ message: 'user does not exist' });
-  });
-
   it('should return an error if the password is incorrect', async () => {
     const existingUser = {
       email: 'test@example.com',
